@@ -18,9 +18,9 @@ img = env.camera_feed()
 img = img[100:412,100:412]
 img = cv2.resize(img, (360,360))
 hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-colorBGR = np.array([[0,227,0],[0,0,145],[0,227,227],[211,114,211],[227,227,227]])  #0.Green , 1.Red , 2Yellow ,3Pink (Patient) ,4.White
-mat = np.zeros((6,6))
-for i in range(5):
+colorBGR = np.array([[227,227,227],[0,227,0],[0,227,227],[0,0,145],[211,114,211],[227,227,0]])  #0.White , 1.Green , 2.Yellow ,3.Red,4.Pink (Patient) ,4.White
+mat = np.zeros((6,6))																	# 5.Blue
+for i in range(6):
 	
 		mask=cv2.inRange(img, colorBGR[i], colorBGR[i])
 		Gmask = cv2.bitwise_and(img, img, mask = mask)
@@ -34,7 +34,10 @@ for i in range(5):
 			x = math.ceil(cx/60) - 1
 			y = math.ceil(cy/60) - 1
 			if(cv2.contourArea(cnt)>2000.0):
-				mat[y][x] = i+1
+				if(i==5):
+					mat[y][x] = 1	
+				else :
+					mat[y][x] = i+1
 			if(i==4):
 				for cnt in contours:
 
