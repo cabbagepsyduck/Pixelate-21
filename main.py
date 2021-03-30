@@ -135,4 +135,6 @@ def backpedal(source, target, searchResult):
 
 print('parent dictionary={}'.format(result))
 
-print('shortest path={}'.format(backpedal(source, target, result)))
+path = backpedal(source, target, result)
+
+print('shortest path={}'.format(path))
