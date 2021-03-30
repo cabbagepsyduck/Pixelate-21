@@ -7,6 +7,8 @@ import cv2
 import os
 import numpy as np
 import math
+from collections import defaultdict
+from numpy import inf
 
 
 
@@ -45,7 +47,89 @@ for i in range(6):
 	
 print(mat)
 print(len(contours))
-cv2.drawContours(img, contours, 0, (50,50,50),3)
-cv2.imshow('original', img)
-cv2.imshow('maskg', Gmask)
-cv2.waitKey(0)	
+graph = defaultdict(dict)
+costs = {}
+
+for i in range(6):
+	for j in range(6):
+		if j<5:
+			if mat[i][j+1] > 0:
+				n=str(i)+ str(j)
+				m=str(i)+ str(j+1)
+				item = {m : mat[i][j+1]}
+				graph[n].update(item)
+		if j>0:
+			if mat[i][j-1] > 0:
+				n=str(i)+ str(j)
+				m=str(i)+ str(j-1)
+				item = {m : mat[i][j-1]}
+				graph[n].update(item)
+		if i<5:
+			if mat[i+1][j] > 0:
+				n=str(i)+ str(j)
+				m=str(i+1)+ str(j)
+				item = {m : mat[i+1][j]}
+				graph[n].update(item)
+		if i>0:
+			if mat[i-1][j] > 0:
+				n=str(i)+ str(j)
+				m=str(i-1)+ str(j)
+				item = {m : mat[i-1][j]}
+				graph[n].update(item)
+print(graph)
+
+for nodes in graph:
+	costs[nodes] = inf	
+	costs['00'] = 0
+
+print(costs)
+
+parents = {}
+
+def search(source, target, graph, costs, parents):
+    
+    nextNode = source
+    
+    while nextNode != target:
+        
+        for neighbor in graph[nextNode]:
+            
+            if graph[nextNode][neighbor] + costs[nextNode] < costs[neighbor]:
+                
+                costs[neighbor] = graph[nextNode][neighbor] + costs[nextNode]
+                
+                parents[neighbor] = nextNode
+                
+            del graph[neighbor][nextNode]
+            
+        del costs[nextNode]
+        
+        nextNode = min(costs, key=costs.get)
+        
+    return parents
+
+result = search('00', '12', graph, costs, parents)
+
+def backpedal(source, target, searchResult):
+    
+    node = target
+    
+    backpath = [target]
+    
+    path = []
+    
+    while node != source:
+        
+        backpath.append(searchResult[node])
+        
+        node = searchResult[node]
+        
+    for i in range(len(backpath)):
+        
+        path.append(backpath[-i - 1])
+        
+    return path
+
+print('parent dictionary={}'.format(result))
+
+print('longest path={}'.format(backpedal('00', '12', result)))
