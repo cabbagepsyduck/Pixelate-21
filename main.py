@@ -78,9 +78,12 @@ for i in range(6):
 				graph[n].update(item)
 print(graph)
 
+source = '00'
+target = '54'
+
 for nodes in graph:
 	costs[nodes] = inf	
-	costs['00'] = 0
+	costs[source] = 0
 
 print(costs)
 
@@ -108,7 +111,7 @@ def search(source, target, graph, costs, parents):
         
     return parents
 
-result = search('00', '12', graph, costs, parents)
+result = search(source, target, graph, costs, parents)
 
 def backpedal(source, target, searchResult):
     
@@ -132,4 +135,4 @@ def backpedal(source, target, searchResult):
 
 print('parent dictionary={}'.format(result))
 
-print('shortest path={}'.format(backpedal('00', '12', result)))
+print('longest path={}'.format(backpedal(source, target, result)))
