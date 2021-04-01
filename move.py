@@ -34,14 +34,28 @@ def clockwise():
 
 def anti_clockwise():
 	env.move_husky(-0.2, 0.2, -0.2, 0.2)
+def facing(husky_front, husky_centre_coords):
+
+	if(husky_front[1] < husky_centre_coords[1] and abs(husky_front[0]-husky_centre_coords[0])<15):
+		return 'left'
+	elif(husky_front[1] > husky_centre_coords[1] and abs(husky_front[0]-husky_centre_coords[0])<15):
+		return 'right'
+	elif(husky_front[0] < husky_centre_coords[0] and abs(husky_front[1]-husky_centre_coords[1])<15):
+		return 'up'
+	elif(husky_front[0] > husky_centre_coords[0] and abs(husky_front[1]-husky_centre_coords[1])<15):
+		return 'down'
+	else:
+		return None
+
 
 if __name__=="__main__":
   
-	path = [[5,5],[5,4],[5,3]]
+	path = np.array([[5,5],[5,4],[4,4],[3,4],[2,4],[2,3]])
 	pos = [0,0]
 	i=0
 	k=1
 	env = gym.make("pix_sample_arena-v0")
+	direction = None
 
 
     
@@ -55,7 +69,7 @@ if __name__=="__main__":
 
 		if(i%500==0):
 			img = env.camera_feed()
-			img = img[80:432,88:432]
+			img = img[80:432,80:432]
 			img = cv2.resize(img, (360,360))
 			# img = cv2.resize(img, (360,360))
 			
@@ -70,19 +84,19 @@ if __name__=="__main__":
 
 			img = aruco.drawDetectedMarkers(img, corners, borderColor=(0, 0, 255))
 
-			husky_centre_coords = [(corners[0][0][0][1]+corners[0][0][1][1])*0.5, (corners[0][0][0][0]+corners[0][0][2][0])*0.5]
+			husky_centre_coords = [(corners[0][0][0][1]+corners[0][0][2][1])*0.5, (corners[0][0][0][0]+corners[0][0][2][0])*0.5]
 
-			husky_centre = [math.floor((corners[0][0][0][1]+corners[0][0][1][1]+30)/120.0), math.floor((corners[0][0][0][0]+corners[0][0][2][0]+30)/120.0)]
+			husky_centre = np.array([math.floor((corners[0][0][0][1]+corners[0][0][1][1]-30)/102.84), math.floor((corners[0][0][0][0]+corners[0][0][2][0]-30)/102.84)])
 
 			husky_front = [(corners[0][0][0][1]+corners[0][0][1][1])*0.5,corners[0][0][0][0]]
 
-			print(husky_centre, husky_centre_coords, husky_front)		# img = cv2.resize(img, (360,360))
+			print(path[k],husky_centre, husky_centre_coords, husky_front, k)		# img = cv2.resize(img, (360,360))
 
 			
 			cv2.imshow("img", img)
 			cv2.waitKey(1)
 			
-			direction = None
+			
 
 			if(path[k][1] == husky_centre[1]-1):
 				direction = 'left'
@@ -98,18 +112,21 @@ if __name__=="__main__":
 			print(direction)	
 
 			if(direction == 'left'):
-				if(abs(husky_front[1]-husky_centre_coords[1])<50 and husky_front[1] < husky_centre_coords[1]):
-					if(husky_centre != path[k]):
+				if(facing(husky_front,husky_centre_coords)=='left'):   #abs(husky_front[1]-husky_centre_coords[1])<50 and 
+
+					if(husky_centre[0] != path[k][0] or husky_centre[1] != path[k][1]):
 						forward()
+						print('forward')
 					else:
+						print('OOOOOOOOOOOOOOOOOOOooo')
 						k=k+1
 				else:
 					clockwise()
 
 
 			elif(direction == 'right'):
-				if(abs(husky_front[1]-husky_centre_coords[1])<50 and husky_front[1] < husky_centre_coords[1]):
-					if(husky_centre != path[k]):
+				if(facing(husky_front,husky_centre_coords)=='right'):  #abs(husky_front[1]-husky_centre_coords[1])<50 and 
+					if(husky_centre[0] != path[k][0] or husky_centre[1] != path[k][1]):
 						forward()
 					else:
 						k=k+1
@@ -118,8 +135,8 @@ if __name__=="__main__":
 					
 
 			elif(direction == 'up'):
-				if(abs(husky_front[0]-husky_centre_coords[0])<10 and husky_front[0] < husky_centre_coords[0]):
-					if(husky_centre != path[k]):
+				if(facing(husky_front,husky_centre_coords)=='up'): #abs(husky_front[0]-husky_centre_coords[0])<50 and 
+					if(husky_centre[0] != path[k][0] or husky_centre[1] != path[k][1]):
 						forward()
 					else:
 						k=k+1
@@ -129,8 +146,8 @@ if __name__=="__main__":
 
 
 			elif(direction == 'left'):
-				if(abs(husky_front[0]-husky_centre_coords[0])<10 and husky_front[0] > husky_centre_coords[0]):
-					if(husky_centre != path[k]):
+				if(facing(husky_front,husky_centre_coords)=='left'):  #abs(husky_front[0]-husky_centre_coords[0])<50 and 
+					if(husky_centre[0] != path[k][0] or husky_centre[1] != path[k][1]):
 						forward()
 					else:
 						k=k+1
