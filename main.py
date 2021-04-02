@@ -138,3 +138,9 @@ print('parent dictionary={}'.format(result))
 path = backpedal(source, target, result)
 
 print('shortest path={}'.format(path))
+
+shortest_path = []
+for i in range(len(path)):
+	shortest_path.append([int(path[i][0]),int(path[i][1])])
+
+print(shortest_path)
